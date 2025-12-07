@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from openai import OpenAI
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class ChatService:
     """AI-powered chat service for sales forecasting insights"""
     
-    def __init__(self, forecast_data: Dict = None):
+    def __init__(self, forecast_data: Optional[Dict[str, Any]] = None):
         api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
             logger.warning("OPENROUTER_API_KEY not set")
@@ -45,7 +45,7 @@ When answering questions, reference this data and provide specific insights. Be 
         
         return context
     
-    def chat(self, user_message: str, conversation_history: List[Dict] = None) -> Dict[str, Any]:
+    def chat(self, user_message: str, conversation_history: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
         """
         Send a message and get AI response
         
