@@ -343,6 +343,14 @@ class Forecaster:
     
     def forecast(self, model_type: ModelType, horizon: int = 6,
                  aggregation: AggregationType = AggregationType.MONTHLY) -> Dict[str, Any]:
+        # If LightGBM is requested but unavailable, fall back to Prophet
+        if model_type == ModelType.LIGHTGBM:
+            try:
+                _import_lightgbm()
+            except Exception as e:
+                logger.warning(f"LightGBM unavailable, falling back to Prophet: {e}")
+                model_type = ModelType.PROPHET
+        
         if model_type == ModelType.PROPHET:
             return self.train_prophet(horizon, aggregation)
         else:

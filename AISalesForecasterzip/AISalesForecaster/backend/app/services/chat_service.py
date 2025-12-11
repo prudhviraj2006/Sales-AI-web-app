@@ -18,9 +18,13 @@ class ChatService:
         
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://openrouter.io/api/v1"
+            base_url="https://openrouter.io/api/v1",
+            default_headers={
+                "HTTP-Referer": "https://replit.dev",
+                "X-Title": "AI Sales Forecaster"
+            }
         )
-        self.model = "openai/gpt-4-turbo"
+        self.model = "meta-llama/llama-2-70b-chat"
         self.forecast_data = forecast_data or {}
         self.conversation_history = []
     
