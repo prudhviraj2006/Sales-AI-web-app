@@ -3,7 +3,7 @@ import json
 import logging
 from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
-from openai import OpenAI
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -12,19 +12,12 @@ class ChatService:
     """AI-powered chat service for sales forecasting insights"""
     
     def __init__(self, forecast_data: Optional[Dict[str, Any]] = None):
-        api_key = os.environ.get("OPENROUTER_API_KEY")
-        if not api_key:
+        self.api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not self.api_key:
             logger.warning("OPENROUTER_API_KEY not set")
         
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url="https://openrouter.io/api/v1",
-            default_headers={
-                "HTTP-Referer": "https://replit.dev",
-                "X-Title": "AI Sales Forecaster"
-            }
-        )
-        self.model = "meta-llama/llama-2-70b-chat"
+        self.api_url = "https://openrouter.io/api/v1/chat/completions"
+        self.model = "mistralai/mistral-7b-instruct:free"
         self.forecast_data = forecast_data or {}
         self.conversation_history = []
     
@@ -87,15 +80,26 @@ When answering questions, reference this data and provide specific insights. Be 
                 "content": user_message
             })
             
-            # Call OpenRouter API
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=0.7,
-                max_tokens=1024
-            )
+            # Call OpenRouter API directly
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "HTTP-Referer": "https://replit.dev",
+                "X-Title": "AI Sales Forecaster",
+                "Content-Type": "application/json"
+            }
             
-            ai_response = response.choices[0].message.content
+            payload = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 1024
+            }
+            
+            response = requests.post(self.api_url, headers=headers, json=payload, timeout=30)
+            response.raise_for_status()
+            
+            data = response.json()
+            ai_response = data['choices'][0]['message']['content']
             
             return {
                 'success': True,
