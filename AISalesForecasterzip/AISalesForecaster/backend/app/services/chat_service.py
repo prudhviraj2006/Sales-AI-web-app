@@ -12,12 +12,12 @@ class ChatService:
     """AI-powered chat service for sales forecasting insights"""
     
     def __init__(self, forecast_data: Optional[Dict[str, Any]] = None):
-        self.api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.api_key = os.environ.get("OPENAI_API_KEY")
         if not self.api_key:
-            logger.warning("OPENROUTER_API_KEY not set")
+            logger.warning("OPENAI_API_KEY not set")
         
-        self.api_url = "https://openrouter.io/api/v1/chat/completions"
-        self.model = "mistralai/mistral-7b-instruct:free"
+        self.api_url = "https://api.openai.com/v1/chat/completions"
+        self.model = "gpt-3.5-turbo"
         self.forecast_data = forecast_data or {}
         self.conversation_history = []
     
@@ -80,11 +80,9 @@ When answering questions, reference the provided data and give specific insights
                 "content": user_message
             })
             
-            # Call OpenRouter API
+            # Call OpenAI API
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
-                "HTTP-Referer": "https://replit.dev",
-                "X-Title": "AI Sales Forecaster",
                 "Content-Type": "application/json"
             }
             
@@ -98,7 +96,7 @@ When answering questions, reference the provided data and give specific insights
             response = requests.post(self.api_url, headers=headers, json=payload, timeout=30)
             
             if response.status_code != 200:
-                logger.error(f"OpenRouter API error: {response.status_code} - {response.text}")
+                logger.error(f"OpenAI API error: {response.status_code} - {response.text}")
                 return {
                     'success': False,
                     'error': f"API error: {response.status_code}",
