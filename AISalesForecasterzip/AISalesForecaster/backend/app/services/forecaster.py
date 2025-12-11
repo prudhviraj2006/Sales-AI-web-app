@@ -6,9 +6,11 @@ import logging
 import warnings
 
 from prophet import Prophet
-import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Lazy import of lightgbm to avoid loading system libraries at module level
+lgb = None
 
 from ..models.schemas import (
     ModelType, AggregationType, ForecastMetrics, 
@@ -18,6 +20,19 @@ from .bias_detector import BiasDetector
 
 warnings.filterwarnings('ignore')
 logger = logging.getLogger(__name__)
+
+
+def _import_lightgbm():
+    """Lazy import LightGBM to avoid system library loading at module init"""
+    global lgb
+    if lgb is None:
+        try:
+            import lightgbm as lgb_module
+            lgb = lgb_module
+        except (ImportError, OSError) as e:
+            logger.error(f"Failed to import lightgbm: {e}")
+            raise
+    return lgb
 
 
 class Forecaster:
@@ -195,6 +210,8 @@ class Forecaster:
 
     def train_lightgbm(self, horizon: int = 6,
                        aggregation: AggregationType = AggregationType.MONTHLY) -> Dict[str, Any]:
+        _import_lightgbm()
+        
         self.model_type = ModelType.LIGHTGBM
         
         df = self.df.copy()
