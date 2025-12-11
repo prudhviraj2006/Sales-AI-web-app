@@ -87,13 +87,4 @@ export const runScenario = async (jobId, params) => {
   return response.data;
 };
 
-export const chatWithAI = async (jobId, message, conversationHistory = []) => {
-  const response = await api.post(`/chat`, {
-    job_id: jobId,
-    message: message,
-    conversation_history: conversationHistory
-  });
-  return response.data;
-};
-
 export default api;

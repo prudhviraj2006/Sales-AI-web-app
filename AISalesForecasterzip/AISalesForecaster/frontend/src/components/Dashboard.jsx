@@ -13,7 +13,6 @@ import RecommendationCards from './RecommendationCards';
 import ScenarioSimulator from './ScenarioSimulator';
 import ConfidenceRiskCard from './ConfidenceRiskCard';
 import BiasAnalysis from './BiasAnalysis';
-import ChatBot from './ChatBot';
 
 function Dashboard({ forecastData, jobId, insightsData, uploadData, darkMode }) {
   const [tabIndex, setTabIndex] = useState(0);
@@ -756,8 +755,6 @@ function Dashboard({ forecastData, jobId, insightsData, uploadData, darkMode }) 
           <ChevronRight size={20} />
         </button>
       </div>
-
-      <ChatBot jobId={jobId} darkMode={darkMode} />
     </div>
   );
 }
