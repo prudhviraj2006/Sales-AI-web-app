@@ -3,7 +3,7 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-import httpx
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class ChatService:
             logger.warning("OPENROUTER_API_KEY not set")
         
         self.api_url = "https://openrouter.io/api/v1/chat/completions"
-        self.model = "gpt-3.5-turbo"
+        self.model = "mistralai/mistral-7b-instruct:free"
         self.forecast_data = forecast_data or {}
         self.conversation_history = []
     
@@ -95,27 +95,26 @@ When answering questions, reference the provided data and give specific insights
                 "max_tokens": 1024
             }
             
-            with httpx.Client(timeout=30.0) as client:
-                response = client.post(self.api_url, headers=headers, json=payload)
-                
-                if response.status_code != 200:
-                    logger.error(f"OpenRouter API error: {response.status_code} - {response.text}")
-                    return {
-                        'success': False,
-                        'error': f"API error: {response.status_code}",
-                        'response': "Sorry, I encountered an error. Please try again."
-                    }
-                
-                data = response.json()
-                ai_response = data['choices'][0]['message']['content']
-                
+            response = requests.post(self.api_url, headers=headers, json=payload, timeout=30)
+            
+            if response.status_code != 200:
+                logger.error(f"OpenRouter API error: {response.status_code} - {response.text}")
                 return {
-                    'success': True,
-                    'response': ai_response,
-                    'timestamp': datetime.now().isoformat(),
-                    'model': self.model,
-                    'tokens_used': 0
+                    'success': False,
+                    'error': f"API error: {response.status_code}",
+                    'response': "Sorry, I encountered an error. Please try again."
                 }
+            
+            data = response.json()
+            ai_response = data['choices'][0]['message']['content']
+            
+            return {
+                'success': True,
+                'response': ai_response,
+                'timestamp': datetime.now().isoformat(),
+                'model': self.model,
+                'tokens_used': 0
+            }
         
         except Exception as e:
             logger.error(f"Chat error: {str(e)}")
