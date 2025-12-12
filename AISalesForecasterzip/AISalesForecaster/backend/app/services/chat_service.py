@@ -16,8 +16,8 @@ class ChatService:
         if not self.api_key:
             logger.warning("OPENROUTER_API_KEY not set")
         
-        self.api_url = "https://openrouter.io/api/v1/chat/completions"
-        self.model = "meta-llama/llama-2-70b-chat"
+        self.api_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.model = "mistralai/mistral-7b-instruct:free"
         self.forecast_data = forecast_data or {}
         self.conversation_history = []
     
