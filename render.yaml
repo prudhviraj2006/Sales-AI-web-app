@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ai-sales-forecaster-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    disk:
+      name: data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_PATH
+        value: data/forecaster.db
+      - key: UPLOAD_DIR
+        value: uploads
